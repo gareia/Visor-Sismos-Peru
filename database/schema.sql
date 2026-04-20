@@ -24,3 +24,5 @@ CREATE TABLE sismos(
 	fecha_corte DATE,
 	geom GEOMETRY(Point, 4326)
 );
+
+CREATE INDEX idx_sismos_geom ON sismos USING GIST (geom);
