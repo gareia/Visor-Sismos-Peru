@@ -3,11 +3,11 @@ import psycopg2
 import os
 from psycopg2.extras import execute_batch
 
-print(os.getenv("ENV"))
-
 if os.getenv("ENV") != "production":
     from dotenv import load_dotenv 
     load_dotenv() 
+
+isProduction = os.getenv("ENV") == "production"
 
 print(os.getenv("DATABASE_URL"))
 
@@ -33,6 +33,8 @@ df["FECHA_UTC"] = pd.to_datetime(df["FECHA_UTC"], format="%Y%m%d", errors="coerc
 df["FECHA_CORTE"] = pd.to_datetime(df["FECHA_CORTE"], format="%Y%d%m", errors="coerce").dt.date
 
 df["HORA_UTC"] = pd.to_datetime(df["HORA_UTC"].astype(str).str.zfill(6), format="%H%M%S", errors="coerce").dt.time
+
+df = df.dropna(subset=["LATITUD", "LONGITUD", "FECHA_UTC"])
 
 print("Filas limpias: ", len(df))
 

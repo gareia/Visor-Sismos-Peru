@@ -2,7 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 CREATE TABLE staging_sismos(
-	id TEXT,
+	id TEXT UNIQUE,
 	fecha_utc TEXT,
 	hora_utc TEXT,
 	lat TEXT,
@@ -14,7 +14,7 @@ CREATE TABLE staging_sismos(
 
 CREATE TABLE sismos(
 	id SERIAL PRIMARY KEY,
-	id_externo TEXT,
+	id_externo TEXT UNIQUE,
 	fecha_utc DATE,
 	hora_utc TIME,
 	lat DOUBLE PRECISION,

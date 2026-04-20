@@ -1,7 +1,7 @@
 
 ## Visor de Sismos - Perú (Versión 1)
 
-Aplicación web para la visualización de eventos sísmicos en Perú utilizando datos abiertos, base de datos espacial (PostGIS) y un backend en Flask.
+Aplicación web para la visualización de eventos sísmicos en Perú utilizando datos abiertos, base de datos espacial (PostGIS) y un backend en Flask con Python 3.12.13.
 
 ![Visor](docs/visor.jpeg)
 
