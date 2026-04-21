@@ -24,10 +24,12 @@
                     <input type="date" class="form-control" id="fechaHasta" name="fechaHasta" max="2023-12-31" disabled aria-disabled="true" />
                 </div>
                 <div class="col-auto">
-                    <button type="button" class="btn btn-success" id="btnBuscar">Buscar</button>
+                    <button type="button" class="btn btn-success" id="btnFiltrar">Filtrar</button>
                 </div>
             </div>
-
+            <p style="margin:10px; font-weight:bold;">
+            Haz click en las bolitas para ver más detalle de cada sismo.
+            </p>
             <div id="map" style="height:600px;"></div>
         </div>
 
@@ -77,7 +79,7 @@
             const datosIniciales = {{ datos_sismos | tojson }};
             renderSismos(datosIniciales);
 
-            $('#btnBuscar').on('click', () => {
+            $('#btnFiltrar').on('click', () => {
                 const inicio = $fechaDesde.val();
                 const fin = $fechaHasta.val();
                 if (!inicio || !fin) {
