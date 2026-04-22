@@ -1,9 +1,11 @@
 
 ## Visor de Sismos - Perú (Versión 1)
 
+🔗 **Demo en producción:** https://visor-sismos-peru.onrender.com/
+
 Aplicación web para la visualización de eventos sísmicos en Perú utilizando datos abiertos, base de datos espacial (PostGIS) y un backend en Flask con Python 3.12.13.
 
-![Visor](docs/visor.jpeg)
+![Visor](docs/visor1.3.png)
 
 Los pasos para replicarlo:
 
@@ -17,10 +19,11 @@ Los pasos para replicarlo:
 8. Ejecutar aplicación (python backend/app.py)
 9. Probar API (/api/sismos)
 
-Los datos utilizados provienen del:
 
-**Instituto Geofísico del Perú** 
-*Catálogo Sísmico desde 1960*
+## 📚 Fuentes y créditos
 
-Disponible en:
-https://www.datosabiertos.gob.pe/dataset/cat%C3%A1logo-s%C3%ADsmico-desde-1960-instituto-geof%C3%ADsico-del-per%C3%BA-igp
+- Datos sísmicos: Instituto Geofísico del Perú (IGP)  
+  https://www.datosabiertos.gob.pe/
+
+- Base cartográfica: OpenStreetMap  
+  © OpenStreetMap contributors
