@@ -75,7 +75,7 @@
 
                     <!-- Mapa -->
                     <div class="col-md-9">
-                        <strong>Haz click en las bolitas para ver más detalle de cada sismo.</strong>
+                        <strong>⚠️ Mostrando 500 resultados. Haz click en los puntos para ver detalle.</strong>
 
                         <div id="loading" style="display:none;">Cargando...</div>
                         <div id="map" style="height: 80vh;"></div>
@@ -88,6 +88,7 @@
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery-ui@1.13.2/dist/jquery-ui.min.js"></script>
         <script>
+
             const $fechaDesde = $('#fechaDesde');
             const $fechaHasta = $('#fechaHasta');
 
@@ -109,43 +110,63 @@
             });
 
             const map = L.map('map').setView([-12.0464, -77.0428], 5);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-                }).addTo(map);
-
-            const markersLayer = L.layerGroup().addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+                {attribution: '&copy; OpenStreetMap'}).addTo(map);
 
             const legend = L.control({ position: 'bottomright' });
             legend.onAdd = function () {
-                const div = L.DomUtil.create('div', 'map-legend');
+                const div = L.DomUtil.create('div', "map-legend");
                 div.innerHTML = `
-                    <div class="legend-title">Leyenda (magnitud)</div>
+                    <div class="legend-title">Magnitud</div>
                     <div class="legend-item">
-                        <span class="legend-swatch" style="background: red;"></span>
-                        <span>Fuertes</span>
+                        <i class="legend-swatch" style="background:red"></i>Alta
                     </div>
                     <div class="legend-item">
-                        <span class="legend-swatch" style="background: orange;"></span>
-                        <span>Moderados</span>
+                        <span class="legend-swatch" style="background:orange"></span>Media
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-swatch" style="background:green"></span>Baja
                     </div>
                 `;
                 L.DomEvent.disableClickPropagation(div);
                 L.DomEvent.disableScrollPropagation(div);
                 return div;
-            };
+            }
             legend.addTo(map);
 
+            const reglasMagnitud = [
+                {min: 6, categoria: "alta", color:"red", radio:8 },
+                {min: 4.5, categoria: "media", color:"orange", radio:6 },
+                {min: 0, categoria: "baja", color:"green", radio:4 }
+            ]
+            function getInfoMagnitud(magnitud){
+                return reglasMagnitud.find(r=> magnitud >= r.min) || {categoria:"ninguna", color:"gray"}
+            }
+
+            console.log(0||10);
+            console.log(0??15);
+
+            const capas = {};
+            const overlays = {};
+            reglasMagnitud.forEach(r => {capas[r.categoria] = L.layerGroup().addTo(map)}); //Es dinámico
+            reglasMagnitud.forEach(r => {overlays["Magnitud " + r.categoria] = capas[r.categoria]});
+            L.control.layers(null, overlays).addTo(map);
+           
             function renderSismos(data) {
-                markersLayer.clearLayers();
+                //markersLayer.clearLayers();
+                capas.alta.clearLayers();
+                capas.media.clearLayers();
+                capas.baja.clearLayers();
+
                 data.forEach(sismo => {
-                    const color = sismo.magnitud >= 5 ? 'red' : 'orange';
-                    L.circleMarker([sismo.lat, sismo.lon], { radius: 6, color: color })
-                        .addTo(markersLayer)
+                    const info = getInfoMagnitud(sismo.magnitud);
+                    L.circleMarker([sismo.lat, sismo.lon], { radius: info.radio, color: info.color })
+                        .addTo(capas[info.categoria]) //.addTo(markersLayer)
                         .bindPopup(`Magnitud: ${sismo.magnitud}<br>
                                     Profundidad: ${sismo.profundidad}<br>
                                     Fecha: ${sismo.fecha}`);
                 });
+                
             }
 
             const datosIniciales = {{ datos_sismos | tojson }};

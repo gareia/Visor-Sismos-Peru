@@ -23,19 +23,20 @@ def get_connection():
         os.getenv("DATABASE_URL")
     )
 
-def obtener_sismos(inicio=None, fin=None):
+def obtener_sismos(inicio=None, fin=None, departamento=None):
     conn = get_connection()
     cur = conn.cursor()
 
     if inicio and fin:
-        cur.execute("""
-            SELECT id_externo, magnitud, profundidad,
-                    ST_X(geom) as lon, ST_Y(geom) as lat,
-                    fecha_utc, hora_utc
-            FROM sismos
-            WHERE fecha_utc BETWEEN %s AND %s
-            LIMIT 500;
-        """, (inicio, fin))
+        
+            cur.execute("""
+                SELECT id_externo, magnitud, profundidad,
+                        ST_X(geom) as lon, ST_Y(geom) as lat,
+                        fecha_utc, hora_utc
+                FROM sismos
+                WHERE fecha_utc BETWEEN %s AND %s
+                LIMIT 500;
+            """, (inicio, fin))
     else:
         cur.execute("""
             SELECT id_externo, magnitud, profundidad,
@@ -75,9 +76,10 @@ def get_sismos():
     
     inicio = request.args.get("inicio")
     fin = request.args.get("fin")
-    print(inicio, fin)
+    departamento = request.args.get("departamento")
+    print(inicio, fin, departamento)
 
-    datos_sismos = obtener_sismos(inicio=inicio, fin=fin)
+    datos_sismos = obtener_sismos(inicio=inicio, fin=fin, departamento=departamento)
     return jsonify(datos_sismos)
 
 if __name__ == "__main__":
