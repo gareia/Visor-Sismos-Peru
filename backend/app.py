@@ -13,6 +13,8 @@ port = int(os.environ.get("PORT", 5000))
 app = Flask(__name__)
 CORS(app)
 
+MAX_RESULTS = 500
+
 def get_connection():
     return psycopg2.connect(
         #dbname=os.getenv("DB_NAME"),
@@ -27,25 +29,35 @@ def obtener_sismos(inicio=None, fin=None, departamento=None):
     conn = get_connection()
     cur = conn.cursor()
 
-    if inicio and fin:
-        
-            cur.execute("""
+    filters = []
+    params = []
+
+    query_total = "SELECT COUNT(*) FROM sismos"
+
+    query_base = """
                 SELECT id_externo, magnitud, profundidad,
                         ST_X(geom) as lon, ST_Y(geom) as lat,
                         fecha_utc, hora_utc
-                FROM sismos
-                WHERE fecha_utc BETWEEN %s AND %s
-                LIMIT 500;
-            """, (inicio, fin))
-    else:
-        cur.execute("""
-            SELECT id_externo, magnitud, profundidad,
-                    ST_X(geom) as lon, ST_Y(geom) as lat,
-                    fecha_utc, hora_utc
-            FROM sismos
-            LIMIT 500;
-        """)
+                FROM sismos"""
+            
+    if inicio and fin:
+        filters.append("fecha_utc BETWEEN %s AND %s")
+        params.extend([inicio, fin])
 
+    if filters:
+        query_base += " WHERE "+ " AND ".join(filters)
+        query_total += " WHERE "+ " AND ".join(filters)
+
+
+    print(query_total)
+    cur.execute(query_total, tuple(params))
+    total = cur.fetchone()[0]
+
+    query_base += " LIMIT %s;"
+    params.append(MAX_RESULTS)
+
+    print(query_base)
+    cur.execute(query_base, tuple(params))
     rows = cur.fetchall()
 
     result = []
@@ -63,13 +75,16 @@ def obtener_sismos(inicio=None, fin=None, departamento=None):
     cur.close()
     conn.close()
 
-    return result
+    return result, total
+
+def build_response(data, total):
+    return {"data": data, "limit":MAX_RESULTS, "total":total}
 
 @app.route("/")
 def index():
 
-    datos_sismos = obtener_sismos()
-    return render_template("index.html", datos_sismos=datos_sismos)
+    datos_sismos, total = obtener_sismos()
+    return render_template("index.html", initial_data=build_response(datos_sismos, total))
 
 @app.route("/api/sismos")
 def get_sismos():
@@ -79,8 +94,8 @@ def get_sismos():
     departamento = request.args.get("departamento")
     print(inicio, fin, departamento)
 
-    datos_sismos = obtener_sismos(inicio=inicio, fin=fin, departamento=departamento)
-    return jsonify(datos_sismos)
+    datos_sismos, total = obtener_sismos(inicio=inicio, fin=fin, departamento=departamento)
+    return jsonify(build_response(datos_sismos, total))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=(not isProduction), port=port)
