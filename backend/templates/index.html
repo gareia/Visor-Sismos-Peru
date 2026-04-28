@@ -75,7 +75,8 @@
 
                     <!-- Mapa -->
                     <div class="col-md-9">
-                        <strong>⚠️ Mostrando 500 resultados. Haz click en los puntos para ver detalle.</strong>
+                        <strong id="info-resultados"></strong><br>
+                        <strong>ℹ️ Haz click en los puntos para ver más detalle.</strong>
 
                         <div id="loading" style="display:none;">Cargando...</div>
                         <div id="map" style="height: 80vh;"></div>
@@ -119,13 +120,13 @@
                 div.innerHTML = `
                     <div class="legend-title">Magnitud</div>
                     <div class="legend-item">
-                        <i class="legend-swatch" style="background:red"></i>Alta
+                        <i class="legend-swatch" style="background:red"></i>Alta (≥ 6)
                     </div>
                     <div class="legend-item">
-                        <span class="legend-swatch" style="background:orange"></span>Media
+                        <span class="legend-swatch" style="background:orange"></span>Media (≥ 4.5)
                     </div>
                     <div class="legend-item">
-                        <span class="legend-swatch" style="background:green"></span>Baja
+                        <span class="legend-swatch" style="background:green"></span>Baja (≥ 0)
                     </div>
                 `;
                 L.DomEvent.disableClickPropagation(div);
@@ -135,16 +136,13 @@
             legend.addTo(map);
 
             const reglasMagnitud = [
-                {min: 6, categoria: "alta", color:"red", radio:8 },
-                {min: 4.5, categoria: "media", color:"orange", radio:6 },
-                {min: 0, categoria: "baja", color:"green", radio:4 }
+                {min: 6, categoria: "alta", color:"red", radio:8, descripcion:"Alta (≥ 6)" },
+                {min: 4.5, categoria: "media", color:"orange", radio:6, descripcion:"Media (≥ 4.5)" },
+                {min: 0, categoria: "baja", color:"green", radio:4, descripcion:"Baja (≥ 0)" }
             ]
             function getInfoMagnitud(magnitud){
                 return reglasMagnitud.find(r=> magnitud >= r.min) || {categoria:"ninguna", color:"gray"}
             }
-
-            console.log(0||10);
-            console.log(0??15);
 
             const capas = {};
             const overlays = {};
@@ -153,12 +151,27 @@
             L.control.layers(null, overlays).addTo(map);
            
             function renderSismos(data) {
+                
+                const sismos = data.data
+                const limit = data.limit
+                const total = data.total
+
+                if(total >= limit){
+                    $("#info-resultados").text(`⚠️ Mostrando ${limit} resultados de ${total}.`)
+                }else{
+                    if(total === 1){
+                        $("#info-resultados").text(`⚠️ Mostrando el único resultado.`)
+                    }else{
+                        $("#info-resultados").text(`⚠️ Mostrando los ${total} resultados.`)
+                    }
+                }
+
                 //markersLayer.clearLayers();
                 capas.alta.clearLayers();
                 capas.media.clearLayers();
                 capas.baja.clearLayers();
 
-                data.forEach(sismo => {
+                sismos.forEach(sismo => {
                     const info = getInfoMagnitud(sismo.magnitud);
                     L.circleMarker([sismo.lat, sismo.lon], { radius: info.radio, color: info.color })
                         .addTo(capas[info.categoria]) //.addTo(markersLayer)
@@ -169,7 +182,7 @@
                 
             }
 
-            const datosIniciales = {{ datos_sismos | tojson }};
+            const datosIniciales = {{ initial_data | tojson }};
             renderSismos(datosIniciales);
 
             $('#btnFiltrar').on('click', () => {
@@ -224,6 +237,7 @@
                                 $('#loading').hide();
                                 $('#yearSlider').slider('enable');
                             });
+
                     }, 400);
                 }
             });
