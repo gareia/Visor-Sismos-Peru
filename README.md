@@ -14,16 +14,22 @@ Los pasos para replicarlo:
 3. Instalar dependencias (requirements.txt)
 4. Crear archivo .env (basado en .env.example)
 5. Configurar variables de entorno 
-6. Crear esquema de base de datos (database/schema.sql)
+6. Crear esquema de base de datos (Ejecutar database/schema.sql)
 7. Ejecutar carga de datos (scripts/load_data.py)
-8. Ejecutar aplicación (python backend/app.py)
-9. Probar API (/api/sismos)
+8. Cargar datos espaciales departamentos (Ejecutar database/seed/departamentos.sql)
+9. Agregar columna departamento para carga más rápida (Ejecutar database/etl/001_add_departamento_column.sql)
+10. Asignar departamento a cada sismo (Ejecutar database/etl/002_fill_departamento.sql)
+11. Ejecutar aplicación (python backend/app.py)
+12. Probar API (/api/sismos)
 
 
 ## 📚 Fuentes y créditos
 
 - Datos sísmicos: Instituto Geofísico del Perú (IGP)  
   https://www.datosabiertos.gob.pe/
+
+- Límites departamentales: shapefile obtenido de IGN
+  https://www.datosabiertos.gob.pe/dataset/limites-departamentales
 
 - Base cartográfica: OpenStreetMap  
   © OpenStreetMap contributors

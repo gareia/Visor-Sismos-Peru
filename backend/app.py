@@ -43,20 +43,21 @@ def obtener_sismos(inicio=None, fin=None, departamento=None):
     if inicio and fin:
         filters.append("fecha_utc BETWEEN %s AND %s")
         params.extend([inicio, fin])
+    
+    if departamento:
+        filters.append("departamento = %s")
+        params.append(departamento)
 
     if filters:
         query_base += " WHERE "+ " AND ".join(filters)
         query_total += " WHERE "+ " AND ".join(filters)
 
-
-    print(query_total)
     cur.execute(query_total, tuple(params))
     total = cur.fetchone()[0]
 
-    query_base += " LIMIT %s;"
+    query_base += " ORDER BY fecha_utc, hora_utc LIMIT %s;"
     params.append(MAX_RESULTS)
 
-    print(query_base)
     cur.execute(query_base, tuple(params))
     rows = cur.fetchall()
 
@@ -92,10 +93,60 @@ def get_sismos():
     inicio = request.args.get("inicio")
     fin = request.args.get("fin")
     departamento = request.args.get("departamento")
-    print(inicio, fin, departamento)
 
     datos_sismos, total = obtener_sismos(inicio=inicio, fin=fin, departamento=departamento)
     return jsonify(build_response(datos_sismos, total))
+
+@app.route("/api/departamentos")
+def get_departamentos():
+    
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT gid AS id, departamen AS nombre
+        FROM departamentos
+        ORDER BY departamen;
+    """)
+
+    rows = cur.fetchall()
+
+    data = [
+        {"id": r[0], "nombre": r[1]} for r in rows
+    ]
+
+    cur.close()
+    conn.close()
+
+    return jsonify(data)
+
+@app.route("/api/departamentos_geo")
+def departamentos_geo():
+    
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT jsonb_build_object(
+            'type', 'FeatureCollection',
+            'features', jsonb_agg(
+                jsonb_build_object(
+                    'type', 'Feature',
+                    'geometry', ST_AsGeoJSON(geom)::jsonb,
+                    'properties', jsonb_build_object(
+                        'id', gid,
+                        'nombre', departamen
+                    )
+                )
+            )
+        )
+        FROM departamentos;
+    """)
+    
+    cur.close()
+    conn.close()
+
+    return jsonify(cur.fetchone()[0])
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=(not isProduction), port=port)
