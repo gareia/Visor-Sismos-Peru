@@ -123,22 +123,23 @@
             const $fechaHasta = $('#fechaHasta');
             const $filtroDepartamento = $('#filtroDepartamento');
 
-            fetch('/api/departamentos')
-            .then(res => res.json())
-            .then(data => {
-                
-                $filtroDepartamento.empty();
-                $filtroDepartamento.append(
-                    $('<option></option>').val('').text('TODOS')
-                );
+            function cargarOpcionesDepartamento() {
+                return fetch('/api/departamentos')
+                    .then((res) => res.json())
+                    .then((departamentos) => {
+                        $filtroDepartamento.empty();
+                        $filtroDepartamento.append(
+                            $('<option></option>').val('').text('TODOS')
+                        );
+                        departamentos.forEach((dep) => {
+                            $filtroDepartamento.append(
+                                $('<option></option>').val(dep.id).text(dep.nombre)
+                            );
+                        });
+                    });
+            }
 
-                data.forEach(dep => {
-                    $filtroDepartamento.append(
-                        $('<option></option>').val(dep.id).text(dep.nombre)
-                    );
-                });
-
-            });
+            cargarOpcionesDepartamento();
 
             $fechaDesde.on('change', () => {
                 const desde = $fechaDesde.val();
@@ -198,53 +199,56 @@
             reglasMagnitud.forEach(r => {overlays["Magnitud " + r.categoria] = capas[r.categoria]});
             const layersControl = L.control.layers(null, overlays).addTo(map);
 
-            fetch('/api/departamentos_geo')
-                .then(res => res.json())
-                .then(data => {
-                    const geojson = data;
-                    const deptStyle = {
-                        color: '#1e40af',
-                        weight: 1,
-                        opacity: 0.75,
-                        fillColor: '#3b82f6',
-                        fillOpacity: 0.06
-                    };
-                    const departamentosGeo = L.geoJSON(geojson, {
-                        style: () => deptStyle,
-                        onEachFeature: function (feature, lyr) {
-                            const nombre = feature.properties && feature.properties.nombre;
-                            if (nombre) lyr.bindPopup(nombre);
-                        }
-                    }).addTo(map);
-                    layersControl.addOverlay(departamentosGeo, 'Departamentos');
-                })
-                .catch(function () {
-                    console.error('No se pudo cargar /api/departamentos_geo');
-                })
-                .finally(function () {
-                    $('#mapDeptGeoLoading').hide();
-                });
-           
-            function fetchSismos(inicio, fin) {
+            function cargarCapaLimitesDepartamentos(mapInstance, capaControl) {
+                return fetch('/api/departamentos_geo')
+                    .then((res) => res.json())
+                    .then((geojson) => {
+                        const deptStyle = {
+                            color: '#1e40af',
+                            weight: 1,
+                            opacity: 0.75,
+                            fillColor: '#3b82f6',
+                            fillOpacity: 0.06
+                        };
+                        const departamentosGeo = L.geoJSON(geojson, {
+                            style: () => deptStyle,
+                            onEachFeature: function (feature, lyr) {
+                                const nombre = feature.properties && feature.properties.nombre;
+                                if (nombre) lyr.bindPopup(nombre);
+                            }
+                        }).addTo(mapInstance);
+                        capaControl.addOverlay(departamentosGeo, 'Departamentos');
+                    })
+                    .catch(() => {
+                        console.error('No se pudo cargar /api/departamentos_geo');
+                    })
+                    .finally(() => {
+                        $('#mapDeptGeoLoading').hide();
+                    });
+            }
+
+            cargarCapaLimitesDepartamentos(map, layersControl);
+
+            function obtenerSismosJson(inicio, fin) {
                 const params = { inicio, fin };
-
                 const dep = $('#filtroDepartamento option:selected').text();
-                if (dep && dep !== 'TODOS'){
-                        params.departamento = dep;
+                if (dep && dep !== 'TODOS') {
+                    params.departamento = dep;
                 }
-
                 const qs = new URLSearchParams(params).toString();
-                const run = () =>
-                    fetch(`/api/sismos?${qs}`)
-                        .then(res => res.json())
-                        .then(data => renderSismos(data))
-                        .catch(() => alert('No se pudo cargar los sismos.'));
+                return fetch(`/api/sismos?${qs}`).then((res) => res.json());
+            }
+
+            function cargarSismosAlMapa(inicio, fin) {
                 $('#yearSlider').slider('disable');
                 $('#loading').show();
-                return run().finally(() => {
-                    $('#loading').hide();
-                    $('#yearSlider').slider('enable');
-                });
+                return obtenerSismosJson(inicio, fin)
+                    .then((data) => renderSismos(data))
+                    .catch(() => alert('No se pudo cargar los sismos.'))
+                    .finally(() => {
+                        $('#loading').hide();
+                        $('#yearSlider').slider('enable');
+                    });
             }
 
             function renderSismos(data) {
@@ -289,7 +293,7 @@
                     alert('Seleccione fecha desde y fecha hasta.');
                     return;
                 }
-                fetchSismos(inicio, fin);
+                cargarSismosAlMapa(inicio, fin);
             });
 
             let yearSliderTimeout;
@@ -321,7 +325,7 @@
                         const r = yearRangeFromSlider();
                         const inicio = `${r.yMin}-01-01`;
                         const fin = `${r.yMax}-12-31`;
-                        fetchSismos(inicio, fin);
+                        cargarSismosAlMapa(inicio, fin);
                     }, 400);
                 }
             });
@@ -335,10 +339,10 @@
                 const inicio = $fechaDesde.val();
                 const fin = $fechaHasta.val();
                 if (inicio && fin) {
-                    fetchSismos(inicio, fin);
+                    cargarSismosAlMapa(inicio, fin);
                 } else {
                     const r = yearRangeFromSlider();
-                    fetchSismos(`${r.yMin}-01-01`, `${r.yMax}-12-31`);
+                    cargarSismosAlMapa(`${r.yMin}-01-01`, `${r.yMax}-12-31`);
                 }
             });
 
