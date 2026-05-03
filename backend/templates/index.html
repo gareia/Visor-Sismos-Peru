@@ -38,6 +38,21 @@
                 border: 1px solid rgba(0, 0, 0, 0.25);
                 flex: 0 0 auto;
             }
+            .map-dept-geo-loading {
+                position: absolute;
+                inset: 0;
+                z-index: 1100;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.78);
+                font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-weight: 600;
+                color: #1e3a8a;
+                text-align: center;
+                pointer-events: auto;
+                border-radius: 2px;
+            }
         </style>
     </head>
     <body>
@@ -88,7 +103,12 @@
                         <strong>ℹ️ Haz click en los puntos para ver más detalle.</strong>
 
                         <div id="loading" style="display:none;">Cargando...</div>
-                        <div id="map" style="height: 80vh;"></div>
+                        <div class="position-relative">
+                            <div id="mapDeptGeoLoading" class="map-dept-geo-loading" role="status" aria-live="polite">
+                                Cargando límites departamentales..
+                            </div>
+                            <div id="map" style="height: 80vh;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -173,13 +193,41 @@
 
             const capas = {};
             const overlays = {};
+            
             reglasMagnitud.forEach(r => {capas[r.categoria] = L.layerGroup().addTo(map)}); //Es dinámico
             reglasMagnitud.forEach(r => {overlays["Magnitud " + r.categoria] = capas[r.categoria]});
-            L.control.layers(null, overlays).addTo(map);
+            const layersControl = L.control.layers(null, overlays).addTo(map);
+
+            fetch('/api/departamentos_geo')
+                .then(res => res.json())
+                .then(data => {
+                    const geojson = data;
+                    const deptStyle = {
+                        color: '#1e40af',
+                        weight: 1,
+                        opacity: 0.75,
+                        fillColor: '#3b82f6',
+                        fillOpacity: 0.06
+                    };
+                    const departamentosGeo = L.geoJSON(geojson, {
+                        style: () => deptStyle,
+                        onEachFeature: function (feature, lyr) {
+                            const nombre = feature.properties && feature.properties.nombre;
+                            if (nombre) lyr.bindPopup(nombre);
+                        }
+                    }).addTo(map);
+                    layersControl.addOverlay(departamentosGeo, 'Departamentos');
+                })
+                .catch(function () {
+                    console.error('No se pudo cargar /api/departamentos_geo');
+                })
+                .finally(function () {
+                    $('#mapDeptGeoLoading').hide();
+                });
            
             function fetchSismos(inicio, fin) {
                 const params = { inicio, fin };
-                
+
                 const dep = $('#filtroDepartamento option:selected').text();
                 if (dep && dep !== 'TODOS'){
                         params.departamento = dep;

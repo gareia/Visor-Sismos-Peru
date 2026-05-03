@@ -142,11 +142,11 @@ def departamentos_geo():
         )
         FROM departamentos;
     """)
-    
+    row = cur.fetchone()
     cur.close()
     conn.close()
 
-    return jsonify(cur.fetchone()[0])
+    return jsonify(row[0])
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=(not isProduction), port=port)
