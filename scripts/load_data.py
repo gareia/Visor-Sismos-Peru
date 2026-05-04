@@ -9,14 +9,13 @@ if os.getenv("ENV") != "production":
 
 isProduction = os.getenv("ENV") == "production"
 
-print(os.getenv("DATABASE_URL"))
-
 if os.getenv("ENV") == "production":
     conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")
 else:
     conn = psycopg2.connect(os.getenv("DATABASE_URL"))
 
 cursor = conn.cursor()
+print("Conexión realizada")
 
 df = pd.read_csv(
     "data/CatalogoSismos1960_2023.csv",
