@@ -65,42 +65,40 @@
 
                         <h5>Filtros</h5>
 
-                        <!-- Slider rango de años (dos controles) -->
                         <div class="mb-3">
+                            <label class="form-label" for="filtroDepartamento">Departamento</label>
+                            <select id="filtroDepartamento" class="form-select">
+                                <option value="">TODOS</option>
+                            </select>
+                        </div>
+
+                        <hr>
+
+                        <div id="panelFiltroAnios" class="mb-3">
                             <label class="form-label">Años: <strong id="yearLabel">1960 – 2023</strong></label>
                             <div id="yearSlider" class="mt-2"></div>
                         </div>
 
-                        <hr>
-
-                        <!-- Rango manual -->
-                        <div class="mb-2">
-                            <label>Inicio</label>
-                            <input type="date" id="fechaDesde" class="form-control" min="1960-01-01" max="2023-12-31" >
+                        <div id="panelFiltroManual" class="mb-3" style="display: none;">
+                            <div class="mb-2">
+                                <label class="form-label" for="fechaDesde">Inicio</label>
+                                <input type="date" id="fechaDesde" class="form-control" min="1960-01-01" max="2023-12-31" >
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label" for="fechaHasta">Fin</label>
+                                <input type="date" id="fechaHasta" class="form-control" max="2023-12-31" disabled aria-disabled="true" >
+                            </div>
+                            <button type="button" class="btn btn-primary w-100 mt-2" id="btnFiltrar">Filtrar</button>
                         </div>
 
-                        <div class="mb-2">
-                            <label>Fin</label>
-                            <input type="date" id="fechaHasta" class="form-control" max="2023-12-31" disabled aria-disabled="true" >
-                        </div>
-
-                        <hr>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="filtroDepartamento">Departamento</label>
-                            <select id="filtroDepartamento" class="form-select">
-                                <option value="">Cargando…</option>
-                            </select>
-                        </div>
-
-                        <button class="btn btn-primary w-100 mt-2" id="btnFiltrar">Filtrar</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm w-100 mb-3" id="btnCambiarModoFecha"></button>
 
                     </div>
 
                     <!-- Mapa -->
                     <div class="col-md-9">
                         <strong id="info-resultados"></strong><br>
-                        <strong>ℹ️ Haz click en los puntos para ver más detalle.</strong>
+                        <strong>🗺️ Haz click en un departamento para filtrar.</strong>
 
                         <div id="loading" style="display:none;">Cargando...</div>
                         <div class="position-relative">
@@ -109,6 +107,7 @@
                             </div>
                             <div id="map" style="height: 80vh;"></div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -122,6 +121,23 @@
             const $fechaDesde = $('#fechaDesde');
             const $fechaHasta = $('#fechaHasta');
             const $filtroDepartamento = $('#filtroDepartamento');
+
+            let modoFecha = 'slider';
+
+            function aplicarVistaModoFecha() {
+                const $btn = $('#btnCambiarModoFecha');
+                if (modoFecha === 'slider') {
+                    $('#panelFiltroAnios').show();
+                    $('#panelFiltroManual').hide();
+                    $btn.text('Usar rango manual de fechas');
+                } else {
+                    $('#panelFiltroAnios').hide();
+                    $('#panelFiltroManual').show();
+                    $btn.text('Usar rango por años (slider)');
+                }
+            }
+
+            aplicarVistaModoFecha();
 
             function cargarOpcionesDepartamento() {
                 return fetch('/api/departamentos')
@@ -214,7 +230,24 @@
                             style: () => deptStyle,
                             onEachFeature: function (feature, lyr) {
                                 const nombre = feature.properties && feature.properties.nombre;
-                                if (nombre) lyr.bindPopup(nombre);
+                                //if (nombre) lyr.bindPopup(nombre);
+                                lyr.on('click', function () {
+                                    if (!nombre) return;
+                                    const { inicio, fin } = rangoFechasParaSismos();
+                                    $filtroDepartamento.find('option').each(function () {
+                                        if ($(this).text() === nombre) {
+                                            $filtroDepartamento.val($(this).val());
+                                            return false;
+                                        }
+                                    });
+                                    cargarSismosAlMapa(inicio, fin, nombre);
+                                });
+                                    lyr.on('mouseover', function () {
+                                        this.setStyle({ weight: 2, color: '#000' });
+                                    });
+                                    lyr.on('mouseout', function () {
+                                        this.setStyle({ weight: 1, color: '#1e40af' });
+                                    });
                             }
                         }).addTo(mapInstance);
                         capaControl.addOverlay(departamentosGeo, 'Departamentos');
@@ -229,26 +262,18 @@
 
             cargarCapaLimitesDepartamentos(map, layersControl);
 
-            function obtenerSismosJson(inicio, fin) {
+            function obtenerSismosJson(inicio, fin, departamentoExplicito) {
                 const params = { inicio, fin };
-                const dep = $('#filtroDepartamento option:selected').text();
-                if (dep && dep !== 'TODOS') {
-                    params.departamento = dep;
+                if (departamentoExplicito !== undefined && departamentoExplicito !== null && departamentoExplicito !== '') {
+                    params.departamento = departamentoExplicito;
+                } else {
+                    const dep = $('#filtroDepartamento option:selected').text();
+                    if (dep && dep !== 'TODOS') {
+                        params.departamento = dep;
+                    }
                 }
                 const qs = new URLSearchParams(params).toString();
                 return fetch(`/api/sismos?${qs}`).then((res) => res.json());
-            }
-
-            function cargarSismosAlMapa(inicio, fin) {
-                $('#yearSlider').slider('disable');
-                $('#loading').show();
-                return obtenerSismosJson(inicio, fin)
-                    .then((data) => renderSismos(data))
-                    .catch(() => alert('No se pudo cargar los sismos.'))
-                    .finally(() => {
-                        $('#loading').hide();
-                        $('#yearSlider').slider('enable');
-                    });
             }
 
             function renderSismos(data) {
@@ -283,10 +308,31 @@
                 
             }
 
-            const datosIniciales = {{ initial_data | tojson }};
-            renderSismos(datosIniciales);
+            function cargarSismosAlMapa(inicio, fin, departamentoExplicito) {
+                $('#yearSlider').slider('disable');
+                $('#loading').show();
+                return obtenerSismosJson(inicio, fin, departamentoExplicito)
+                    .then((data) => {
+                        renderSismos(data)
+                    })
+                    .catch(() => alert('No se pudo cargar los sismos.'))
+                    .finally(() => {
+                        $('#loading').hide();
+                        $('#yearSlider').slider('enable');
+                    });
+            }
+
+            $('#btnCambiarModoFecha').on('click', () => {
+                modoFecha = modoFecha === 'slider' ? 'manual' : 'slider';
+                aplicarVistaModoFecha();
+                if (modoFecha === 'slider') {
+                    const r = yearRangeFromSlider();
+                    cargarSismosAlMapa(`${r.yMin}-01-01`, `${r.yMax}-12-31`);
+                }
+            });
 
             $('#btnFiltrar').on('click', () => {
+                if (modoFecha !== 'manual') return;
                 const inicio = $fechaDesde.val();
                 const fin = $fechaHasta.val();
                 if (!inicio || !fin) {
@@ -299,11 +345,25 @@
             let yearSliderTimeout;
 
             function yearRangeFromSlider() {
-                const v = $('#yearSlider').slider('option', 'values');
+                const [a, b] = $('#yearSlider').slider('option', 'values');
                 return {
-                    yMin: Math.min(v[0], v[1]),
-                    yMax: Math.max(v[0], v[1])
+                    yMin: Math.min(a, b),
+                    yMax: Math.max(a, b)
                 };
+            }
+
+            function rangoFechasParaSismos() {
+                if (modoFecha === 'slider') {
+                    const r = yearRangeFromSlider();
+                    return { inicio: `${r.yMin}-01-01`, fin: `${r.yMax}-12-31` };
+                }
+                const inicio = $fechaDesde.val();
+                const fin = $fechaHasta.val();
+                if (inicio && fin) {
+                    return { inicio, fin };
+                }
+                const r = yearRangeFromSlider();
+                return { inicio: `${r.yMin}-01-01`, fin: `${r.yMax}-12-31` };
             }
 
             function updateYearLabel(yMin, yMax) {
@@ -316,6 +376,7 @@
                 max: 2023,
                 values: [1960, 2023],
                 slide: function (event, ui) {
+                    if (modoFecha !== 'slider') return;
                     const yMin = ui.values[0];
                     const yMax = ui.values[1];
                     updateYearLabel(yMin, yMax);
@@ -335,15 +396,14 @@
                 updateYearLabel(r.yMin, r.yMax);
             })();
 
+            (function cargarSismosInicialesPorSlider() {
+                const r = yearRangeFromSlider();
+                cargarSismosAlMapa(`${r.yMin}-01-01`, `${r.yMax}-12-31`);
+            })();
+
             $filtroDepartamento.on('change', function () {
-                const inicio = $fechaDesde.val();
-                const fin = $fechaHasta.val();
-                if (inicio && fin) {
-                    cargarSismosAlMapa(inicio, fin);
-                } else {
-                    const r = yearRangeFromSlider();
-                    cargarSismosAlMapa(`${r.yMin}-01-01`, `${r.yMax}-12-31`);
-                }
+                const { inicio, fin } = rangoFechasParaSismos();
+                cargarSismosAlMapa(inicio, fin);
             });
 
         </script>
