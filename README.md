@@ -5,7 +5,7 @@
 
 Aplicación web para la visualización de eventos sísmicos en Perú utilizando datos abiertos, base de datos espacial (PostGIS) y un backend en Flask con Python 3.12.13.
 
-![Visor](docs/visor_030526.png)
+![Visor](docs/visor_080526.png)
 
 Los pasos para replicarlo:
 

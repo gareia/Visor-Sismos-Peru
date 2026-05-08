@@ -211,7 +211,7 @@
       if (!map.hasLayer(heatLayer)) {
         map.addLayer(heatLayer);
       }
-      if (lastHeatPoints.length && heatLayer._map) {
+      if (heatLayer._map) {
         heatLayer.setLatLngs(lastHeatPoints);
       }
     }
@@ -230,36 +230,36 @@
 
     if (usarMarkers) {
       if(totalSismos > LIMITE_POR_MARKERS){
-        $('#info-resultados').text(
-            `📍 Mostrando ${lastMarkersCount} marcadores de ${totalSismos} sismos.`
-        );
+
+        $('#info-resultados').text(`📍 Mostrando ${lastMarkersCount} marcadores de ${totalSismos} sismos.`);
+
       }else{
-        if (totalSismos === 1) {
-          $('#info-resultados').text(
-            `📍 Mostrando el único sismo.`
-          );
+
+        if(totalSismos === 0){
+          $('#info-resultados').text(`📍 No hubo ningún sismo.`);
+        } else if (totalSismos === 1) {
+          $('#info-resultados').text(`📍 Mostrando el único sismo.`);
         }else{
-          $('#info-resultados').text(
-            `📍 Mostrando los ${lastMarkersCount} sismos.`
-          );
+          $('#info-resultados').text(`📍 Mostrando los ${lastMarkersCount} sismos.`);
         }
+        
       }
 
     } else {
       if(totalSismos > limiteHeatPoints){
-        $('#info-resultados').text(
-            `🔥 Mostrando ${lastHeatPointsCount} marcadores de ${totalSismos} sismos.`
-        );
+
+        $('#info-resultados').text(`🔥 Mostrando ${lastHeatPointsCount} marcadores de ${totalSismos} sismos.`);
+
       }else{
-        if (totalSismos === 1) {
-          $('#info-resultados').text(
-            `🔥 Mostrando el único sismo.`
-          );
+        
+        if(totalSismos === 0){ 
+          $('#info-resultados').text(`🔥 No hubo ningún sismo.`);
+        }else if (totalSismos === 1) {
+          $('#info-resultados').text(`🔥 Mostrando el único sismo.`);
         }else{
-          $('#info-resultados').text(
-            `🔥 Mostrando los ${lastHeatPointsCount} sismos.`
-          );
+          $('#info-resultados').text(`🔥 Mostrando los ${lastHeatPointsCount} sismos.`);
         }
+
       }
     }
     
