@@ -13,7 +13,7 @@ port = int(os.environ.get("PORT", 5000))
 app = Flask(__name__)
 CORS(app)
 
-MAX_RESULTS = 500
+MAX_RESULTS = 3000
 
 def get_connection():
     return psycopg2.connect(
