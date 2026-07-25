@@ -1,0 +1,1 @@
+from .earthquake import Earthquake
