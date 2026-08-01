@@ -9,7 +9,7 @@ def list_all_earthquakes(db:Session):
     return [
         EarthquakeResponse(
             id=earthquake.id,
-            occurred_at=earthquake.occured_at,
+            occurred_at=earthquake.occurred_at,
             latitude=earthquake.latitude,
             longitude=earthquake.longitude,
             depth_km=earthquake.depth_km,
