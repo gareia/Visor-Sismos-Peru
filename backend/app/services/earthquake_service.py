@@ -2,9 +2,9 @@ from sqlalchemy.orm import Session
 from app.repositories.earthquake_repository import get_all_earthquakes
 from app.schemas.earthquake_response import EarthquakeResponse
 
-def list_all_earthquakes(db:Session):
+def list_all_earthquakes(db:Session, limit:int, offset:int):
 
-    earthquakes = get_all_earthquakes(db)
+    earthquakes = get_all_earthquakes(db, limit, offset)
 
     return [
         EarthquakeResponse(
