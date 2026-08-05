@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from . import earthquakes_router
+from .v1 import router as v1_router
 
 router = APIRouter()
 
-router.include_router(earthquakes_router.router)
+router.include_router(v1_router, prefix="/v1")
