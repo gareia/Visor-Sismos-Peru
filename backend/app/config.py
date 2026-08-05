@@ -1,9 +1,25 @@
-import os
-from dotenv import load_dotenv
+from pathlib import Path
+from typing import Literal
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+print(BACKEND_DIR)
 
-DATABASE_URL=os.getenv("DATABASE_URL")
-FRONTEND_URL = os.getenv("FRONTEND_URL")
-IS_ENV_DEV=os.getenv("IS_ENV_DEV", "False").strip().lower() == "true"
-DB_SSLMODE=os.getenv("DB_SSLMODE")
+class Settings(BaseSettings):
+    ENV: Literal["dev", "prod"] = "dev"
+    DATABASE_URL: str
+    FRONTEND_URL: str
+
+    model_config = SettingsConfigDict(
+        env_file=BACKEND_DIR/".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
+
+    @property
+    def db_sslmode(self) -> str:
+        return "require" if self.ENV=="prod" else "disable"
+
+settings = Settings()
+
+#load_dotenv()

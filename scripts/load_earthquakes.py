@@ -1,13 +1,13 @@
 import psycopg2
 from psycopg2.extras import execute_batch
 import pandas as pd
-from backend.app.config import DATABASE_URL, DB_SSLMODE
+from backend.app.config import settings
 
 PATH_CSV_DATA = "data/datos_copia_2006-01-01_2026-07-31.csv"
 PATH_SQL_FILE = "scripts/sql/populate_earthquakes.sql"
 
 try:
-    conn = psycopg2.connect(DATABASE_URL, sslmode=DB_SSLMODE)
+    conn = psycopg2.connect(settings.DATABASE_URL, sslmode=settings.db_sslmode)
     cursor = conn.cursor()
 
     print(">> Conexión realizada")

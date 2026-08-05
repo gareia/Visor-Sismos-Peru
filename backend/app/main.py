@@ -1,14 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import router
-from app.config import FRONTEND_URL
+from app.config import settings
 
 app = FastAPI(title="Visor de Sismos en Perú",
               version="1.0.0",
               description="API del visor de sismos")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL],
+    allow_origins=[settings.FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]

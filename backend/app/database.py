@@ -2,9 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 
-from app.config import DATABASE_URL, IS_ENV_DEV
+from app.config import settings
 
-engine = create_engine(DATABASE_URL, echo=IS_ENV_DEV) #, plugins=["geoalchemy2"])
+engine = create_engine(settings.DATABASE_URL, echo=settings.ENV=="dev") #, plugins=["geoalchemy2"])
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
