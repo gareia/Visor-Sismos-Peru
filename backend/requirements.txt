@@ -1,12 +1,12 @@
 
-numpy==1.26.4
-pandas==2.2.2
-
-fastapi==0.136.1
+gunicorn==26.0.0
 uvicorn==0.47.0
-psycopg2-binary==2.9.12
-pydantic==2.13.4
+fastapi==0.136.1
 sqlalchemy==2.0.51
 geoalchemy2==0.20.0
+psycopg2-binary==2.9.12
 alembic==1.18.5
+pydantic==2.13.4
 pydantic-settings==2.14.2
+numpy==1.26.4
+pandas==2.2.2
