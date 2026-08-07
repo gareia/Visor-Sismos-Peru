@@ -11,7 +11,7 @@ const apiClient = axios.create({
     timeout: 10000, //tiempo de espera en una petición
 })
 
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 2;
 const RETRY_DELAY = 10000; //tiempo de espera entre peticiones
 
 function sleep(ms: number): Promise<void>{
@@ -22,16 +22,11 @@ apiClient.interceptors.response.use(
 
     (response) => {
         
-        console.log("Interceptado positivo a la 1era vez");
         const config = response.config as RetryAxiosRequestConfig;
 
         if(config.retryCount && config.retryCount > 0){
             console.log(`Interceptado positivo a la ${config.retryCount} vez`);
             useConnectionStore.getState().showReconnected();
-
-            setTimeout(() => {
-                useConnectionStore.getState().reset();
-            }, 2000);
         }
 
         return response;
@@ -39,7 +34,6 @@ apiClient.interceptors.response.use(
 
     async(error: AxiosError) => {
         
-        console.log("Interceptado negativo");
         const config = error.config as RetryAxiosRequestConfig | undefined;
 
         if (!config){
@@ -50,15 +44,22 @@ apiClient.interceptors.response.use(
 
         const shouldRetry = !error.response || error.response.status >= 500;
 
-        if (shouldRetry && config.retryCount < MAX_RETRIES){
-            config.retryCount += 1;
+        if (shouldRetry) {
 
-            useConnectionStore.getState().startRetry(config.retryCount, MAX_RETRIES);
+            if(config.retryCount < MAX_RETRIES){
 
-            console.log(`Interceptado negativo. Intento ${config.retryCount}/${MAX_RETRIES}`);
-            await sleep(RETRY_DELAY);
-            return apiClient(config); //haz la misma petición
-        }
+                config.retryCount += 1;
+                useConnectionStore.getState().startRetry(config.retryCount, MAX_RETRIES);
+                console.log(`Interceptado negativo. Intento ${config.retryCount}/${MAX_RETRIES}`);
+                
+                await sleep(RETRY_DELAY);
+                return apiClient(config); //haz la misma petición
+
+            } else{
+                useConnectionStore.getState().showFailed();
+                console.log(`Interceptado negativo. Conexión fallida`);
+            }
+        } 
 
         return Promise.reject(error);
     }

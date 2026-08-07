@@ -1,6 +1,8 @@
 import { create } from "zustand";
 
-type ConnectionStatus = "idle" | "retrying" | "reconnected";
+const RESET_TIMER = 10000;
+
+type ConnectionStatus = "idle" | "retrying" | "reconnected" | "failed";
 
 interface ConnectionState {
 
@@ -11,6 +13,7 @@ interface ConnectionState {
 
     startRetry: (retryCount: number, maxRetries: number) => void;
     showReconnected: () => void;
+    showFailed: () => void;
     reset: () => void;
 }
 
@@ -19,10 +22,21 @@ export const useConnectionStore = create<ConnectionState>((set) => ({
     retryCount: 0,
     maxRetries: 0,
 
-    startRetry: (retryCount, maxRetries) =>
+    startRetry: (retryCount, maxRetries) => 
         set({ status:"retrying", retryCount, maxRetries }),
 
-    showReconnected: () => set({status: "reconnected"}),
+    showReconnected: () => {
+        set({status: "reconnected"});
+        setTimeout(() => {
+            set({status: "idle"});
+        }, RESET_TIMER);
+    },
+    showFailed: () => {
+        set({status:"failed"});
+        setTimeout(() => {
+            set({status: "idle"});
+        }, RESET_TIMER);
+    },
 
     reset: () => set({status: "idle", retryCount:0, maxRetries:0})
 }));

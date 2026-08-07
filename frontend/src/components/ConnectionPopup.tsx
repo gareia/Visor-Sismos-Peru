@@ -20,8 +20,16 @@ function ConnectionPopup(){
         );
     }
 
+    if(status === "failed"){
+        return (
+            <div className="connection-popup ">
+            <strong>❌ El servicio no está disponible temporalmente</strong>
+            </div>
+        )
+    }
+
     return (
-        <div className="connection-popup connection-success">
+        <div className="connection-popup ">
          <strong>✅ Conexión restablecida</strong>
         </div>
     )
