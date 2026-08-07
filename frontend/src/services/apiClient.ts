@@ -11,7 +11,7 @@ const apiClient = axios.create({
     timeout: 10000, //tiempo de espera en una petición
 })
 
-const MAX_RETRIES = 2;
+const MAX_RETRIES = 5;
 const RETRY_DELAY = 10000; //tiempo de espera entre peticiones
 
 function sleep(ms: number): Promise<void>{
