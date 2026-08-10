@@ -1,21 +1,16 @@
-import { useState, useEffect } from 'react'
-import { MapContainer, TileLayer, Popup, CircleMarker } from "react-leaflet";
+
+import { MapContainer, TileLayer, Popup, CircleMarker, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import "./EarthquakeMap.css";
+import type { EarthquakeResponse } from '../types/earthquakeResponse';
+import { formatPeruDate } from "../utils/dateUtils";
 
-import { getEarthquakes } from '../services/earthquakeService';
-import type { Earthquake } from '../types/earthquake';
+interface EarthquakeMapProps {
+    earthquakes: EarthquakeResponse[];
+}
 
-export default function EarthquakeMap(){
+export default function EarthquakeMap({earthquakes}: EarthquakeMapProps){
 
-    const [earthquakes, setEarthquakes] = useState<Earthquake[]>([]);
-
-    useEffect(()=>{
-        const loadEarthquakes = async () => {
-            const data = await getEarthquakes();
-            setEarthquakes(data);
-        }
-        loadEarthquakes();
-    }, []);
 
     const reglasMagnitud = [
         { min: 6, categoria: 'alta', color: 'red', radio: 8, descripcion: 'Alta (≥ 6)' },
@@ -34,7 +29,10 @@ export default function EarthquakeMap(){
         <MapContainer 
             style={{height:"100vh", width:"100%"}} 
             center={[-9.19, -75.015]} 
-            zoom={5}>
+            zoom={5}
+            zoomControl={false}
+        >
+            <ZoomControl position="topright"/>
             <TileLayer 
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="&copy; OpenStreetMap contributors"/>
@@ -54,7 +52,7 @@ export default function EarthquakeMap(){
                                 <Popup>
                                 <strong>Magnitud:</strong> {earthquake.magnitude}
                                 <br/>
-                                <strong>Fecha:</strong> {earthquake.occurred_at}
+                                <strong>Fecha:</strong> {formatPeruDate(earthquake.occurred_at)}
                             </Popup>
                         </CircleMarker>
                     );

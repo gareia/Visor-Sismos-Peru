@@ -17,4 +17,9 @@ app.include_router(router,prefix="/api")
 
 @app.get("/")
 def home():
-    return {"mensaje":"Bienvenido al visor de sismos del Perú"}
+    return {
+        "mensaje":"Bienvenido al Visor de Sismos del Perú", 
+        "description": "API para consultar información de actividad sísmica en el Perú.",
+        "docs": "/docs",
+        "status": "ok",
+    }

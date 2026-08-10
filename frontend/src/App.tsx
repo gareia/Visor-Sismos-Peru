@@ -1,12 +1,12 @@
 import './App.css'
 import ConnectionPopup from './components/ConnectionPopup';
-import EarthquakeMap from './components/EarthquakeMap'
+import EarthquakeViewer from './components/EarthquakeViewer';
 
 function App() {
   
   return (
     <>
-      <EarthquakeMap/>
+      <EarthquakeViewer/>
       <ConnectionPopup/>
     </>
   );

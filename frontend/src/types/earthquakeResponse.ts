@@ -1,4 +1,4 @@
-export interface Earthquake {
+export interface EarthquakeResponse {
     id: number;
     external_id: string;
     latitude: number;
