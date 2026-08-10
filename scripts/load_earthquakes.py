@@ -7,6 +7,7 @@ PATH_CSV_DATA = "data/datos_copia_2006-01-01_2026-07-31.csv"
 PATH_SQL_FILE = "scripts/sql/populate_earthquakes.sql"
 
 try:
+    print(f"[AMBIENTE {settings.ENV}]")
     conn = psycopg2.connect(settings.DATABASE_URL, sslmode=settings.db_sslmode)
     cursor = conn.cursor()
 

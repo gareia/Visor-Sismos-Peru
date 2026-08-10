@@ -6,7 +6,7 @@ SELECT
 	hora_utc::TIME,*/
 	id,
     --TO_TIMESTAMP( fecha_utc || LPAD(hora_utc, 6, '0'), 'YYYYMMDDHH24MISS'),
-    TO_TIMESTAMP( fecha_utc || ' ' || hora_utc, 'YYYY-MM-DD HH24:MI:SS') AT TIME ZONE 'UTC',
+    (fecha_utc || ' ' || hora_utc)::timestamp AT TIME ZONE 'UTC',
 	REPLACE(latitud, ',', '.')::DOUBLE PRECISION,
 	REPLACE(longitud, ',', '.')::DOUBLE PRECISION,
 	profundidad_km::DOUBLE PRECISION,
