@@ -40,7 +40,7 @@ def get_all_earthquakes(
     max_magnitude_value = filters.max_magnitude
     if max_magnitude_value is not None:
         query = query.where(
-            Earthquake.magnitude >= max_magnitude_value
+            Earthquake.magnitude <= max_magnitude_value
         )
 
     offset = filters.offset
