@@ -20,6 +20,7 @@ def home():
     return {
         "mensaje":"Bienvenido al Visor de Sismos del Perú", 
         "description": "API para consultar información de actividad sísmica en el Perú.",
+        "demo": "El demo ha sido movido a https://visor-sismos-peru.netlify.app/",
         "docs": "/docs",
         "status": "ok",
     }

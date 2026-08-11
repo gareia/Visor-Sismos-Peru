@@ -117,17 +117,6 @@ function FilterPanel({ onApply, count, hasMore, limit
                             </button>
                         </div>
 
-                        <div className="earthquake-results-info">
-                            {hasMore ? (
-                                <span>
-                                Se encontraron más de {limit} sismos. Acota el rango de búsqueda.
-                                </span>
-                            ) : (
-                                <span>
-                                Mostrando {count} resultados.
-                                </span>
-                            )}
-                        </div>
                     </div>
                 </aside>
                 ) : (
