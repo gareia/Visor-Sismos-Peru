@@ -9,7 +9,9 @@ interface EarthquakeMapProps {
     earthquakes: EarthquakeResponse[];
 }
 
-export default function EarthquakeMap({earthquakes}: EarthquakeMapProps){
+export default function EarthquakeMap({
+    earthquakes,
+}: EarthquakeMapProps){
 
 
     const reglasMagnitud = [
@@ -53,6 +55,9 @@ export default function EarthquakeMap({earthquakes}: EarthquakeMapProps){
                                 <strong>Magnitud:</strong> {earthquake.magnitude}
                                 <br/>
                                 <strong>Fecha:</strong> {formatPeruDate(earthquake.occurred_at)}
+                                <br/>
+                                <strong>Profundidad:</strong> {earthquake.depth_km} Km
+                                <br/>
                             </Popup>
                         </CircleMarker>
                     );

@@ -5,11 +5,12 @@ import EarthquakeMap from "./EarthquakeMap";
 import FilterPanel from "./FilterPanel";
 import type { EarthquakeListResponse } from "../types/earthquakeListResponse";
 import { getEarthquakes } from "../services/earthquakeService";
+import EarthquakeSummary from "./EarthquakeSummary";
 
 function EarthquakeViewer(){
 
     const [earthquakes, setEarthquakes] = useState<EarthquakeResponse[]>([]);
-    
+
     const [earthquakeCount, setEarthquakeCount] = useState(0);
     const [hasMoreEarthquakes, setHasMoreEarthquakes] = useState(false);
     const [earthquakeLimit, setEarthquakeLimit] = useState(0);
@@ -37,8 +38,7 @@ function EarthquakeViewer(){
     useEffect(()=>{loadEarthquakes();}, []);
 
     return (
-        <>
-           
+        <div className="map-container">
             <FilterPanel
                 onApply={handleApplyFilters}
 
@@ -48,7 +48,14 @@ function EarthquakeViewer(){
             />
 
             <EarthquakeMap earthquakes={earthquakes}/>
-        </>
+
+            <EarthquakeSummary 
+                earthquakes={earthquakes}
+                count={earthquakeCount}
+                hasMore={hasMoreEarthquakes}
+                limit={earthquakeLimit}
+            ></EarthquakeSummary>
+        </div>
     )
 
 }
