@@ -1,39 +1,39 @@
 
 import { MapContainer, TileLayer, Popup, CircleMarker, ZoomControl } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import "./EarthquakeMap.css";
 import type { EarthquakeResponse } from '../types/earthquakeResponse';
 import { formatPeruDate } from "../utils/dateUtils";
+import SpatialFilterControl from "./SpatialFilterControl";
+
+import  { type SpatialFilter, SpatialFilterMode } from "../types/spatialFilter";
+import {REGLAS_MAGNITUD } from "../constants.ts";
 
 interface EarthquakeMapProps {
     earthquakes: EarthquakeResponse[];
+    onSpatialFilterChange: (filter: SpatialFilter) => void;
 }
 
 export default function EarthquakeMap({
     earthquakes,
+    onSpatialFilterChange,
 }: EarthquakeMapProps){
-
-
-    const reglasMagnitud = [
-        { min: 6, categoria: 'alta', color: 'red', radio: 8, descripcion: 'Alta (≥ 6)' },
-        { min: 4.5, categoria: 'media', color: 'orange', radio: 6, descripcion: 'Media (≥ 4.5)' },
-        { min: 0, categoria: 'baja', color: 'green', radio: 4, descripcion: 'Baja (≥ 0)' },
-    ];
 
     function obtenerEstiloDesdeMagnitud(magnitud: number){
         return(
-            reglasMagnitud.find(regla => magnitud >= regla.min) ??
-                reglasMagnitud[reglasMagnitud.length - 1]
+            REGLAS_MAGNITUD.find(regla => magnitud >= regla.min) ??
+                REGLAS_MAGNITUD[REGLAS_MAGNITUD.length - 1]
         )
     }
 
     return (
+
         <MapContainer 
-            style={{height:"100vh", width:"100%"}} 
+            style={{height:"100vh", width:"100%", position:"relative"}} 
             center={[-9.19, -75.015]} 
             zoom={5}
             zoomControl={false}
         >
+            <SpatialFilterControl onSpatialFilterChange={onSpatialFilterChange}/>
             <ZoomControl position="topright"/>
             <TileLayer 
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -63,6 +63,7 @@ export default function EarthquakeMap({
                     );
                 }
             )}
+
         </MapContainer>
     )
 }

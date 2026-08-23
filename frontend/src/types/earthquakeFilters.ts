@@ -1,3 +1,4 @@
+import type { SpatialFilter } from "./spatialFilter";
 
 export interface EarthquakeFilters {
     date?: string;
@@ -5,4 +6,5 @@ export interface EarthquakeFilters {
     max_magnitude?: number;
     limit?: number;
     offset?: number;
+    spatial_filter?: SpatialFilter;
 }
