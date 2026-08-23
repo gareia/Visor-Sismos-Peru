@@ -5,7 +5,7 @@ import type { EarthquakeResponse } from '../types/earthquakeResponse';
 import { formatPeruDate } from "../utils/dateUtils";
 import SpatialFilterControl from "./SpatialFilterControl";
 
-import  { type SpatialFilter, SpatialFilterMode } from "../types/spatialFilter";
+import  { type SpatialFilter} from "../types/spatialFilter";
 import {REGLAS_MAGNITUD } from "../constants.ts";
 
 interface EarthquakeMapProps {
