@@ -9,8 +9,12 @@ export const getEarthquakes = async(
     filters: EarthquakeFilters = {}
 ): Promise<EarthquakeListResponse> => {
 
-    const response = await apiClient.get( //axios.get<Earthquake[]>(
+    /*const response = await apiClient.get( //axios.get<Earthquake[]>(
         EARTHQUAKES_URL,{ params: filters }
+    );*/
+
+    const response = await apiClient.post(
+        EARTHQUAKES_URL, filters
     );
 
     return response.data;

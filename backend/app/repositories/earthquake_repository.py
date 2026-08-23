@@ -5,6 +5,9 @@ from app.schemas.earthquake_filters import EarthquakeFilters
 from datetime import datetime, time, timedelta
 from app.constants import PERU_TIMEZONE
 import logging
+import json
+from geoalchemy2 import Geography
+from sqlalchemy import cast
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +22,13 @@ def get_all_earthquakes(
 
     query = select(Earthquake) #db.query(Earthquake)
 
+    #---------------------------------------------
+    # DATE
+    #---------------------------------------------
+
     date_value = filters.date
+    print(f">>> fecha {date_value}")
+
     if date_value is not None:
         
         start_datetime = datetime.combine(date_value, time.min, tzinfo=PERU_TIMEZONE)
@@ -31,6 +40,10 @@ def get_all_earthquakes(
             #func.date(Earthquake.occurred_at) == date_value
         )
 
+    #---------------------------------------------
+    # MAGNITUDE
+    #---------------------------------------------
+    
     min_magnitude_value = filters.min_magnitude
     if min_magnitude_value is not None:
         query = query.where(
@@ -42,6 +55,55 @@ def get_all_earthquakes(
         query = query.where(
             Earthquake.magnitude <= max_magnitude_value
         )
+
+    #---------------------------------------------
+    # SPATIAL FILTER
+    #---------------------------------------------
+    spatial_filter = filters.spatial_filter
+    print(f">>> filtro espacial: {spatial_filter}")
+
+    if spatial_filter is not None:
+
+        print(f"spatial_filter.type {spatial_filter.type}")
+        if spatial_filter.type == "circle":
+
+            point = func.ST_SetSRID(
+                func.ST_MakePoint(
+                    spatial_filter.longitude,
+                    spatial_filter.latitude 
+                ), 4326)
+
+            radius_meters = spatial_filter.radius_km*1000
+
+            query = query.where(
+                func.ST_DWithin(
+                    cast(Earthquake.geom, Geography),
+                    cast(point, Geography),
+                    radius_meters
+                )
+            )
+
+        elif spatial_filter.type == "polygon":
+
+            polygon_geojson = {
+                "type": "Polygon",
+                "coordinates": [
+                    spatial_filter.coordinates
+                ]
+            }
+
+            polygon = func.ST_SetSRID(
+                func.ST_GeomFromGeoJSON(
+                    json.dumps(polygon_geojson)
+                ), 4326
+            )
+
+            query = query.where(
+                func.ST_Within(
+                    Earthquake.geom,
+                    polygon
+                )
+            )
 
     offset = filters.offset
     limit = filters.limit+1 
