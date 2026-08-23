@@ -1,8 +1,9 @@
 export interface EarthquakeResponse {
     id: number;
-    external_id: string;
+    occurred_at: string;
     latitude: number;
     longitude: number;
+    depth_km: number;
     magnitude: number;
-    occurred_at: string;
+
 }

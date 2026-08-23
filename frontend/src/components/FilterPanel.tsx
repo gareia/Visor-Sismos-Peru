@@ -4,15 +4,12 @@ import type { EarthquakeFilters } from "../types/earthquakeFilters";
 
 interface FilterPanelProps {
     onApply: (filters: EarthquakeFilters) => void;
-    count: number;
-    hasMore: boolean;
-    limit: number;
 }
 
-function FilterPanel({ onApply, count, hasMore, limit
+function FilterPanel({ 
+    onApply,
  }: FilterPanelProps){
 
- 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const [selectedDate, setSelectedDate] = useState("");
@@ -26,14 +23,20 @@ function FilterPanel({ onApply, count, hasMore, limit
             max_magnitude: maxMagnitude ? Number(maxMagnitude) : undefined,
         };
 
-        console.table(newFilters);
-
         onApply(newFilters);
     }
+
     const onClear = () => {
+
         setSelectedDate("");
         setMinMagnitude("");
         setMaxMagnitude("");
+
+        onApply({
+            date: undefined, 
+            min_magnitude: undefined,
+            max_magnitude: undefined,
+        });
     }
 
     return (
@@ -117,17 +120,6 @@ function FilterPanel({ onApply, count, hasMore, limit
                             </button>
                         </div>
 
-                        <div className="earthquake-results-info">
-                            {hasMore ? (
-                                <span>
-                                Se encontraron más de {limit} sismos. Acota el rango de búsqueda.
-                                </span>
-                            ) : (
-                                <span>
-                                Mostrando {count} resultados.
-                                </span>
-                            )}
-                        </div>
                     </div>
                 </aside>
                 ) : (
