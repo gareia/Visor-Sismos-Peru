@@ -1,21 +1,10 @@
 
-.earthquake-results-info {
-  margin-top: 16px;
-  padding: 10px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  background-color: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-}
-
 .earthquake-summary {
     position: absolute;
-    top: 150px;
+    top: 120px;
     right: 10px;
 
-    width: 190px;
+    width: 250px;
     padding: 12px;
 
     background-color: rgba(255, 255, 255, 0.95);
@@ -29,38 +18,127 @@
     z-index: 1000;
 }
 
-.earthquake-summary h3 {
-    margin: 0 0 10px 0;
-    font-size: 16px;
+
+/* =========================
+   FILTROS ACTIVOS
+   ========================= */
+
+.active-filters {
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-.earthquake-summary p {
-    margin: 6px 0;
+.active-filters-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.active-filters-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.active-filters-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #420b6e;
+}
+
+.active-filters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+
+/* =========================
+   FILTER CHIP
+   ========================= */
+
+.filter-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    padding: 8px 10px;
+
+    background: #f5f3f7;
+    border: 1px solid #e5dff0;
+    border-radius: 7px;
+
+    min-width: 90px;
+}
+
+.filter-chip-label {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.filter-chip-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #420b6e;
+}
+
+
+/* =========================
+   RESUMEN
+   ========================= */
+
+.summary-section h3 {
+    margin: 0 0 10px 0;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    color: #374151;
+}
+
+.earthquake-results-info {
+    margin-bottom: 16px;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    color: #6b7280;
+}
+
+
+/* =========================
+   ESTADÍSTICAS
+   ========================= */
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 }
 
 .summary-stat {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 4px;
 
-    padding: 6px 0;
-    border-top: 1px solid #ddd;
+    padding: 10px;
+
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
 }
 
 .summary-stat span {
-    color: #555;
+    font-size: 11px;
+    color: #6b7280;
 }
 
 .summary-stat strong {
-    font-size: 14px;
-}
-
-.summary-warning {
-    padding: 7px;
-    border-radius: 5px;
-
-    background-color: #fff3cd;
-    color: #856404;
-
-    font-size: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
 }
