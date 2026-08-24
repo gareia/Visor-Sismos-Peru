@@ -34,7 +34,7 @@ export default function EarthquakeMap({
             zoomControl={false}
         >
             <SpatialFilterControl onSpatialFilterChange={onSpatialFilterChange}/>
-            <ZoomControl position="topright"/>
+            <ZoomControl position="bottomleft"/>
             <TileLayer 
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="&copy; OpenStreetMap contributors"/>

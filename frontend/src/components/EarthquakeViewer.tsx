@@ -72,6 +72,7 @@ function EarthquakeViewer(){
 
             <EarthquakeSummary 
                 earthquakes={earthquakes}
+                filters={filters}
                 count={earthquakeCount}
                 hasMore={hasMoreEarthquakes}
                 limit={earthquakeLimit}

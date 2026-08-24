@@ -73,7 +73,7 @@
   bottom: 0;
   width: 320px;
   background-color: white;
-  z-index: 1000;
+  z-index: 1200;
   padding: 20px;
   box-sizing: border-box;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
