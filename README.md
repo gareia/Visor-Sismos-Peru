@@ -5,7 +5,7 @@ Aplicación web para la visualización de eventos sísmicos en Perú utilizando 
 
 🔗 **Demo:** https://visor-sismos-peru.netlify.app/
 
-![Visor](docs/visor_100826_1548.png)
+![Visor](docs/visor_240826_1150.png)
 
 ### Arquitectura
 
@@ -41,7 +41,7 @@ La base de datos espacial ha sido desarrollada en **PostgreSQL + PostGIS** y des
 El proceso de carga de datos utilizó una tabla staging (staging_earthquakes) donde se validó la información antes de insertarla a la tabla de sismos (earthquakes)
 
 #### A tener en cuenta:
-El backend puede tardar unos segundos en responder después de un periodo de inactividad debido al comportamiento del servicio de hosting.
+La primera carga de datos puede tardar unos segundos si el backend ha estado inactivo. Esto se debe al servicio de hosting. Las siguientes solicitudes deberían responder con normalidad.
 
 #### Pasos para replicarlo:
 

@@ -10,7 +10,7 @@ import {REGLAS_MAGNITUD } from "../constants.ts";
 
 interface EarthquakeMapProps {
     earthquakes: EarthquakeResponse[];
-    onSpatialFilterChange: (filter: SpatialFilter) => void;
+    onSpatialFilterChange: (filter: SpatialFilter | undefined) => void;
 }
 
 export default function EarthquakeMap({
@@ -34,7 +34,7 @@ export default function EarthquakeMap({
             zoomControl={false}
         >
             <SpatialFilterControl onSpatialFilterChange={onSpatialFilterChange}/>
-            <ZoomControl position="topright"/>
+            <ZoomControl position="bottomleft"/>
             <TileLayer 
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="&copy; OpenStreetMap contributors"/>

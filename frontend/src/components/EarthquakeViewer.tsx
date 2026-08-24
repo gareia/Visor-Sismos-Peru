@@ -38,7 +38,7 @@ function EarthquakeViewer(){
 
     }, [] );
 
-    const handleSpatialFilterChange = useCallback( (spatialFilter: SpatialFilter) => {
+    const handleSpatialFilterChange = useCallback( (spatialFilter: SpatialFilter | undefined) => {
         
         setFilters(prevFilters => ({...prevFilters, spatial_filter: spatialFilter})); 
 
@@ -72,6 +72,7 @@ function EarthquakeViewer(){
 
             <EarthquakeSummary 
                 earthquakes={earthquakes}
+                filters={filters}
                 count={earthquakeCount}
                 hasMore={hasMoreEarthquakes}
                 limit={earthquakeLimit}
