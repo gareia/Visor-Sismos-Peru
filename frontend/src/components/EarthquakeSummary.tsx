@@ -1,5 +1,6 @@
-import { NON_FILTER_FIELDS, type EarthquakeFilters } from "../types/earthquakeFilters";
+import { type EarthquakeFilters } from "../types/earthquakeFilters";
 import type { EarthquakeResponse } from "../types/earthquakeResponse";
+import { hasActiveFilters } from "../utils/filterUtils";
 import "./EarthquakeSummary.css"
 
 interface EarthquakeSummaryProps {
@@ -39,16 +40,6 @@ function EarthquakeSummary ({
 
     const averageMagnitude = magnitudes.reduce((sum, magnitude) => sum+magnitude, 0)
     / magnitudes.length;
-
-    const hasActiveFilters = (filters: EarthquakeFilters): boolean => {
-
-        return Object.entries(filters).some(
-            ([key, value])=> 
-                !NON_FILTER_FIELDS.includes(key) 
-                && value !== undefined
-                && value !== null
-        );
-    }
 
     const activeFilters = hasActiveFilters(filters);
 
@@ -113,11 +104,11 @@ function EarthquakeSummary ({
                 <div className="earthquake-results-info">
                     {hasMore ? (
                         <span>
-                        Se encontraron más de {limit} sismos. Acota el rango de búsqueda.
+                        Se encontraron <strong>más de {limit} sismos</strong>. Acota el rango de búsqueda.
                         </span>
                     ) : (
                         <span>
-                        Mostrando {count} resultados.
+                        Mostrando <strong>{count} sismos</strong>.
                         </span>
                     )}
                 </div>

@@ -8,5 +8,3 @@ export interface EarthquakeFilters {
     offset?: number;
     spatial_filter?: SpatialFilter;
 }
-
-export const NON_FILTER_FIELDS = ["limit", "offset"];

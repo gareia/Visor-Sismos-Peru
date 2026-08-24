@@ -10,7 +10,7 @@ import {REGLAS_MAGNITUD } from "../constants.ts";
 
 interface EarthquakeMapProps {
     earthquakes: EarthquakeResponse[];
-    onSpatialFilterChange: (filter: SpatialFilter) => void;
+    onSpatialFilterChange: (filter: SpatialFilter | undefined) => void;
 }
 
 export default function EarthquakeMap({
