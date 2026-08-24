@@ -108,7 +108,9 @@
 
     color: #6b7280;
 }
-
+.earthquake-results-info strong{
+    color:black;
+}
 
 /* =========================
    ESTADÍSTICAS

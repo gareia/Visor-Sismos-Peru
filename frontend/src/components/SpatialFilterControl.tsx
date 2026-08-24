@@ -1,12 +1,13 @@
 import { useMap } from "react-leaflet";
 import  {type SpatialFilter, SpatialFilterMode } from "../types/spatialFilter";
 import "./SpatialFilterControl.css";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet-draw";
+import { Trash2 } from "lucide-react";
 
 interface SpatialFilterControlProps {
-    onSpatialFilterChange: (filter: SpatialFilter) => void;
+    onSpatialFilterChange: (filter: SpatialFilter | undefined) => void;
 }
 
 function SpatialFilterControl ({
@@ -16,6 +17,7 @@ function SpatialFilterControl ({
     const map = useMap();
     const [isDrawing, setIsDrawing] = useState(false);
     const [activeTool, setActiveTool] = useState<SpatialFilterMode>(SpatialFilterMode.NONE);
+    const [activeSpatialFilter, setActiveSpatialFilter] = useState(false);
     const drawHandlerRef = useRef<L.Draw.Feature | null>(null);
     const zoneGroupRef = useRef<L.FeatureGroup | null>(null);
 
@@ -58,6 +60,14 @@ function SpatialFilterControl ({
         setIsDrawing(true);
 
     }
+
+    const handleClearSpatialFilter = useCallback(()=>{
+
+        zoneGroupRef.current?.clearLayers();
+        setActiveSpatialFilter(false);
+        onSpatialFilterChange(undefined);
+
+    }, [onSpatialFilterChange]);
 
     useEffect(() => {
 
@@ -112,6 +122,7 @@ function SpatialFilterControl ({
                 onSpatialFilterChange(spatialFilter);
             }
 
+            setActiveSpatialFilter(true);
             stopDrawing();
 
         }
@@ -149,6 +160,13 @@ function SpatialFilterControl ({
                     && activeTool === SpatialFilterMode.POLYGON 
                     ? "Dibujando polígono": "Dibujar polígono" }
             </button>
+            {activeSpatialFilter && (
+                <button
+                    onClick={handleClearSpatialFilter}
+                >
+                    <Trash2 size={20} color="red"/>
+                </button>
+            )}
         </div>
     )
 }

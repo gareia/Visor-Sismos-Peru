@@ -5,7 +5,7 @@ Aplicación web para la visualización de eventos sísmicos en Perú utilizando 
 
 🔗 **Demo:** https://visor-sismos-peru.netlify.app/
 
-![Visor](docs/visor_240826_1019.png)
+![Visor](docs/visor_240826_1150.png)
 
 ### Arquitectura
 
